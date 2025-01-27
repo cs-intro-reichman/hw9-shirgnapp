@@ -7,10 +7,40 @@ public class MemorySpace {
 	
 	// A list of the memory blocks that are presently allocated
 	private LinkedList allocatedList;
-
 	// A list of memory blocks that are presently free
 	private LinkedList freeList;
+	public class TestMemorySpace {
+			public static void main(String[] args) {
+				MemorySpace memory = new MemorySpace(100);
+				System.out.println("Initial free list: " + memory);
+				System.out.println("\nTesting malloc...");
+				int address1 = memory.malloc(20);
+				System.out.println("Allocated block at address: " + address1);
+				System.out.println("Memory state: " + memory);
+		
+				int address2 = memory.malloc(30);
+				System.out.println("Allocated block at address: " + address2);
+				System.out.println("Memory state: " + memory);
+				int address3 = memory.malloc(50);
+				System.out.println("Allocated block at address: " + address3);
+				System.out.println("Memory state: " + memory);
+				int address4 = memory.malloc(10);
+				System.out.println("Trying to allocate another block (should fail): " + address4);
+	
+				System.out.println("\nTesting free...");
+				memory.free(address2);
+				System.out.println("Freed block at address: " + address2);
+				System.out.println("Memory state: " + memory);
+		
+				memory.free(address1);
+				System.out.println("Freed block at address: " + address1);
+				System.out.println("Memory state: " + memory);
+				System.out.println("\nTesting defrag...");
+				memory.defrag();
+				System.out.println("After defrag: " + memory);
 
+			}
+		}		
 	/**
 	 * Constructs a new managed memory space of a given maximal size.
 	 * 
@@ -57,11 +87,32 @@ public class MemorySpace {
 	 *        the length (in words) of the memory block that has to be allocated
 	 * @return the base address of the allocated block, or -1 if unable to allocate
 	 */
-	public int malloc(int length) {		
-		//// Replace the following statement with your code
+	public int malloc(int length) {
+		ListIterator iterator = freeList.iterator();
+
+		while (iterator.hasNext()) {
+			MemoryBlock freeBlock = iterator.next(); 
+	
+			if (freeBlock.length >= length) {
+
+				MemoryBlock allocatedBlock = new MemoryBlock(freeBlock.baseAddress, length);
+
+				freeBlock.baseAddress += length;
+				freeBlock.length -= length;
+	
+				if (freeBlock.length == 0) {
+					freeList.remove(freeBlock); 
+				}
+	
+				allocatedList.addLast(allocatedBlock);
+	
+				return allocatedBlock.baseAddress;
+			}
+		}
 		return -1;
 	}
-
+	
+		
 	/**
 	 * Frees the memory block whose base address equals the given address.
 	 * This implementation deletes the block whose base address equals the given 
@@ -71,8 +122,22 @@ public class MemorySpace {
 	 *            the starting address of the block to freeList
 	 */
 	public void free(int address) {
-		//// Write your code here
+		
+		Node current = allocatedList.getFirst();
+		while (current != null) {
+			MemoryBlock allocatedBlock = current.block;
+			if (allocatedBlock.baseAddress == address) {
+				allocatedList.remove(current);
+				freeList.addLast(allocatedBlock);
+				return; 
+			}
+			current = current.next;
+		}
+		throw new IllegalArgumentException("No block with the given base address found.");
 	}
+	
+		
+	
 	
 	/**
 	 * A textual representation of the free list and the allocated list of this memory space, 
@@ -88,6 +153,24 @@ public class MemorySpace {
 	 * In this implementation Malloc does not call defrag.
 	 */
 	public void defrag() {
-		//// Write your code here
-	}
+			ListIterator iterator = freeList.iterator();
+			LinkedList newFreeList = new LinkedList();
+			Node current = freeList.getFirst();
+			while (current != null) {
+				MemoryBlock currentBlock = current.block;
+		
+				if (current.next != null && 
+					currentBlock.baseAddress + currentBlock.length == current.next.block.baseAddress) {
+					currentBlock.length += current.next.block.length;
+					freeList.remove(current.next);
+				} else {
+					newFreeList.addLast(currentBlock);
+					current = current.next;
+				}
+			}
+
+			freeList = newFreeList;
+		}
+		
+	
 }
