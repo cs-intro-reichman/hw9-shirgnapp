@@ -132,8 +132,9 @@ public class MemorySpace {
 			}
 			current = current.next;
 		}
-		throw new IllegalArgumentException("No block with the given base address found or already freed.");
-	}	
+		throw new IllegalArgumentException("Block not found in allocated list or already freed.");
+	}
+	
 	
 	
 	/**
@@ -149,24 +150,25 @@ public class MemorySpace {
 	 * Normally, called by malloc, when it fails to find a memory block of the requested size.
 	 * In this implementation Malloc does not call defrag.
 	 */
-	
-	 public void defrag() {
+	public void defrag() {
 		if (freeList.getSize() <= 1) {
-			return; 
+			return;
 		}
+	
 		Node current = freeList.getFirst();
 		while (current != null && current.next != null) {
 			MemoryBlock currentBlock = current.block;
 			MemoryBlock nextBlock = current.next.block;
 	
 			if (currentBlock.baseAddress + currentBlock.length == nextBlock.baseAddress) {
-				currentBlock.length += nextBlock.length;
-				freeList.remove(current.next);
+				currentBlock.length += nextBlock.length; 
+				freeList.remove(current.next); 
 			} else {
 				current = current.next; 
 			}
 		}
 	}
+	
 	
 	
 		
