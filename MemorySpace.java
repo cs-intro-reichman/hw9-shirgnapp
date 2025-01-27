@@ -132,7 +132,7 @@ public class MemorySpace {
 			}
 			current = current.next;
 		}
-		throw new IllegalArgumentException("index must be between 0 and size");
+		throw new IllegalArgumentException("No block with the given base address found.");
 	}
 	
 	
@@ -149,25 +149,30 @@ public class MemorySpace {
 	 * Normally, called by malloc, when it fails to find a memory block of the requested size.
 	 * In this implementation Malloc does not call defrag.
 	 */
+	
 	public void defrag() {
+		if (freeList.getSize() <= 1) {
+			return;
+		}
+
 		LinkedList newFreeList = new LinkedList();
 		Node current = freeList.getFirst();
 	
 		while (current != null) {
 			MemoryBlock currentBlock = current.block;
-	
-			if (current.next != null &&
-				currentBlock.baseAddress + currentBlock.length == current.next.block.baseAddress) {
+			while (current.next != null &&
+				   currentBlock.baseAddress + currentBlock.length == current.next.block.baseAddress) {
 				currentBlock.length += current.next.block.length;
-				freeList.remove(current.next);
-			} else {
-				newFreeList.addLast(currentBlock);
-				current = current.next;
+				freeList.remove(current.next); 
 			}
+	
+			newFreeList.addLast(currentBlock);
+			current = current.next;
 		}
 	
 		freeList = newFreeList;
 	}
+	
 		
 	
 }
