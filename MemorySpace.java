@@ -127,13 +127,13 @@ public class MemorySpace {
 			if (current.block.baseAddress == address) {
 				MemoryBlock blockToFree = current.block;
 				allocatedList.remove(current);
-				freeList.addLast(blockToFree);
+				freeList.addLast(blockToFree); 
 				return;
 			}
 			current = current.next;
 		}
-		throw new IllegalArgumentException("No block with the given base address found.");
-	}
+		throw new IllegalArgumentException("No block with the given base address found or already freed.");
+	}	
 	
 	
 	/**
@@ -150,28 +150,24 @@ public class MemorySpace {
 	 * In this implementation Malloc does not call defrag.
 	 */
 	
-	public void defrag() {
+	 public void defrag() {
 		if (freeList.getSize() <= 1) {
-			return;
+			return; 
 		}
-
-		LinkedList newFreeList = new LinkedList();
 		Node current = freeList.getFirst();
-	
-		while (current != null) {
+		while (current != null && current.next != null) {
 			MemoryBlock currentBlock = current.block;
-			while (current.next != null &&
-				   currentBlock.baseAddress + currentBlock.length == current.next.block.baseAddress) {
-				currentBlock.length += current.next.block.length;
-				freeList.remove(current.next); 
+			MemoryBlock nextBlock = current.next.block;
+	
+			if (currentBlock.baseAddress + currentBlock.length == nextBlock.baseAddress) {
+				currentBlock.length += nextBlock.length;
+				freeList.remove(current.next);
+			} else {
+				current = current.next; 
 			}
-	
-			newFreeList.addLast(currentBlock);
-			current = current.next;
 		}
-	
-		freeList = newFreeList;
 	}
+	
 	
 		
 	
