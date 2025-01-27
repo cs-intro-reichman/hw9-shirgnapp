@@ -122,21 +122,18 @@ public class MemorySpace {
 	 *            the starting address of the block to freeList
 	 */
 	public void free(int address) {
-		
 		Node current = allocatedList.getFirst();
 		while (current != null) {
-			MemoryBlock allocatedBlock = current.block;
-			if (allocatedBlock.baseAddress == address) {
+			if (current.block.baseAddress == address) {
+				MemoryBlock blockToFree = current.block;
 				allocatedList.remove(current);
-				freeList.addLast(allocatedBlock);
-				return; 
+				freeList.addLast(blockToFree);
+				return;
 			}
 			current = current.next;
 		}
-		throw new IllegalArgumentException("No block with the given base address found.");
+		throw new IllegalArgumentException("index must be between 0 and size");
 	}
-	
-		
 	
 	
 	/**
@@ -153,24 +150,24 @@ public class MemorySpace {
 	 * In this implementation Malloc does not call defrag.
 	 */
 	public void defrag() {
-			ListIterator iterator = freeList.iterator();
-			LinkedList newFreeList = new LinkedList();
-			Node current = freeList.getFirst();
-			while (current != null) {
-				MemoryBlock currentBlock = current.block;
-		
-				if (current.next != null && 
-					currentBlock.baseAddress + currentBlock.length == current.next.block.baseAddress) {
-					currentBlock.length += current.next.block.length;
-					freeList.remove(current.next);
-				} else {
-					newFreeList.addLast(currentBlock);
-					current = current.next;
-				}
+		LinkedList newFreeList = new LinkedList();
+		Node current = freeList.getFirst();
+	
+		while (current != null) {
+			MemoryBlock currentBlock = current.block;
+	
+			if (current.next != null &&
+				currentBlock.baseAddress + currentBlock.length == current.next.block.baseAddress) {
+				currentBlock.length += current.next.block.length;
+				freeList.remove(current.next);
+			} else {
+				newFreeList.addLast(currentBlock);
+				current = current.next;
 			}
-
-			freeList = newFreeList;
 		}
+	
+		freeList = newFreeList;
+	}
 		
 	
 }
