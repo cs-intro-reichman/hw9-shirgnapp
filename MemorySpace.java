@@ -157,23 +157,29 @@ public class MemorySpace {
 	//
 	//	throw new IllegalArgumentException("ERROR IllegalArgumentException: Block not found in allocated list or already freed.");
 	//}
-	public void free(int baseAddress) {
-	
+
+	public void free(int address) {
+
 		if (allocatedList.getSize() == 0) {
 			throw new IllegalArgumentException("ERROR IllegalArgumentException: index must be between 0 and size");
 		}
+		boolean blockFreed = false; 
 		ListIterator allocatedIterator = allocatedList.iterator();
 		while (allocatedIterator.hasNext()) {
-			if (allocatedIterator.current.block.baseAddress == baseAddress) {
+			if (allocatedIterator.current.block.baseAddress == address) {
 				Node nodeToFree = allocatedIterator.current;
 				freeList.addLast(nodeToFree.block);
 				allocatedList.remove(nodeToFree);
-				return;
+	
+				blockFreed = true; 
+				break; 
 			}
 			allocatedIterator.next();
 		}
 	
-		throw new IllegalArgumentException("ERROR IllegalArgumentException: Block not found in allocated list or already freed.");
+		if (!blockFreed) {
+			throw new IllegalArgumentException("ERROR IllegalArgumentException: Block not found in allocated list or already freed.");
+		}
 	}
 	
 	
