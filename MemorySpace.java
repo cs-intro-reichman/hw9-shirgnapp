@@ -121,18 +121,23 @@ public class MemorySpace {
 	 * @param baseAddress
 	 *            the starting address of the block to freeList
 	 */
-	public void free(int address) {
-		Node current = allocatedList.getFirst();
-		while (current != null) {
-			if (current.block.baseAddress == address) {
-				MemoryBlock blockToFree = current.block;
-				allocatedList.remove(current);
-				freeList.addLast(blockToFree); 
-				return;
-			}
-			current = current.next;
+	public void free(int baseAddress) {
+		if (allocatedList.getSize() == 0) {
+			throw new IllegalArgumentException("ERROR IllegalArgumentException: index must be between 0 and size");
 		}
-		throw new IllegalArgumentException("Block not found in allocated list or already freed.");
+	
+		ListIterator allocatedIterator = allocatedList.iterator();
+		while (allocatedIterator.hasNext()) {
+			if (allocatedIterator.current.block.baseAddress == baseAddress) {
+				Node nodeToFree = allocatedIterator.current;
+				freeList.addLast(nodeToFree.block);
+			allocatedList.remove(nodeToFree);
+			return; // Exit after freeing the block
+			}
+			allocatedIterator.next();
+		}
+	
+		throw new IllegalArgumentException("ERROR IllegalArgumentException: Block not found in allocated list or already freed.");
 	}
 	
 	
@@ -151,23 +156,45 @@ public class MemorySpace {
 	 * In this implementation Malloc does not call defrag.
 	 */
 	public void defrag() {
-		if (freeList.getSize() <= 1) {
-			return;
-		}
+		boolean mergeFound = false;
+		MemoryBlock mergedBlock = null;
+		Node firstNodeToRemove = null;
+		Node secondNodeToRemove = null;
+		int insertionIndex = 0;
 	
-		Node current = freeList.getFirst();
-		while (current != null && current.next != null) {
-			MemoryBlock currentBlock = current.block;
-			MemoryBlock nextBlock = current.next.block;
+		while (!mergeFound) {
+			ListIterator outerIterator = freeList.iterator();
+			while (outerIterator.hasNext() && !mergeFound) {
+				int combinedAddress = outerIterator.current.block.baseAddress + outerIterator.current.block.length;
+				ListIterator innerIterator = freeList.iterator();
+				
+				while (innerIterator.hasNext() && !mergeFound) {
+					if (innerIterator.current.block.baseAddress == combinedAddress) {
+						mergedBlock = new MemoryBlock(outerIterator.current.block.baseAddress, 
+													  outerIterator.current.block.length + innerIterator.current.block.length);
+						firstNodeToRemove = innerIterator.current;
+						insertionIndex = freeList.indexOf(outerIterator.current.block);
+					secondNodeToRemove = outerIterator.current;
+						mergeFound = true;
+					}
+					innerIterator.next();
+				}
+				outerIterator.next();
+			}
 	
-			if (currentBlock.baseAddress + currentBlock.length == nextBlock.baseAddress) {
-				currentBlock.length += nextBlock.length; 
-				freeList.remove(current.next); 
+			if (mergeFound) {
+				freeList.remove(firstNodeToRemove);
+				freeList.add(insertionIndex, mergedBlock);
+				freeList.remove(secondNodeToRemove);
+				mergeFound = false;
 			} else {
-				current = current.next; 
+				mergeFound = true; 
 			}
 		}
 	}
+	
+	
+	
 	
 	
 	
