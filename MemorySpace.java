@@ -121,64 +121,43 @@ public class MemorySpace {
 	 * @param baseAddress
 	 *            the starting address of the block to freeList
 	 */
-	//public void free(int baseAddress) {
+	
+	
+
+	//public void free(int address) {
+
 	//	if (allocatedList.getSize() == 0) {
 	//		throw new IllegalArgumentException("ERROR IllegalArgumentException: index must be between 0 and size");
 	//	}
-	//
+	//	boolean blockFreed = false; 
 	//	ListIterator allocatedIterator = allocatedList.iterator();
 	//	while (allocatedIterator.hasNext()) {
-	//		if (allocatedIterator.current.block.baseAddress == baseAddress) {
-	//			Node nodeToFree = allocatedIterator.current;
-	//			freeList.addLast(nodeToFree.block);
-	//		allocatedList.remove(nodeToFree);
-	//		return; // Exit after freeing the block
-	//		}
-	//		allocatedIterator.next();
-	//	}
-	//
-	//	throw new IllegalArgumentException("ERROR IllegalArgumentException: Block not found in allocated list or already freed.");
-	//}
-	//public void free(int baseAddress) {
-	//	if (allocatedList.getSize() == 0) {
-	//		throw new IllegalArgumentException("ERROR IllegalArgumentException: index must be between 0 and size");
-	//	}
-	//	ListIterator allocatedIterator = allocatedList.iterator();
-	//	while (allocatedIterator.hasNext()) {
-	//		if (allocatedIterator.current.block.baseAddress == baseAddress) {
+	//		if (allocatedIterator.current.block.baseAddress == address) {
 	//			Node nodeToFree = allocatedIterator.current;
 	//			freeList.addLast(nodeToFree.block);
 	//			allocatedList.remove(nodeToFree);
 	//
-	//			return; 
+	//			blockFreed = true; 
+	//			break; 
 	//		}
 	//		allocatedIterator.next();
 	//	}
-	//
-	//	throw new IllegalArgumentException("ERROR IllegalArgumentException: Block not found in allocated list or already freed.");
+	//	if (!blockFreed) {
+	//		throw new IllegalArgumentException("ERROR IllegalArgumentException: Block not found in allocated list or already freed.");
+	//	}
 	//}
-
 	public void free(int address) {
-
 		if (allocatedList.getSize() == 0) {
-			throw new IllegalArgumentException("ERROR IllegalArgumentException: index must be between 0 and size");
+			throw new IllegalArgumentException("index must be between 0 and size");
 		}
-		boolean blockFreed = false; 
-		ListIterator allocatedIterator = allocatedList.iterator();
-		while (allocatedIterator.hasNext()) {
-			if (allocatedIterator.current.block.baseAddress == address) {
-				Node nodeToFree = allocatedIterator.current;
-				freeList.addLast(nodeToFree.block);
-				allocatedList.remove(nodeToFree);
-	
-				blockFreed = true; 
-				break; 
+		ListIterator allocIterator = allocatedList.iterator();
+		while (allocIterator.hasNext()) {
+			MemoryBlock alloCurrentBlock = allocIterator.next();
+			if (alloCurrentBlock.baseAddress == address) {
+				allocatedList.remove(alloCurrentBlock);
+				freeList.addLast(alloCurrentBlock);
+				return;
 			}
-			allocatedIterator.next();
-		}
-	
-		if (!blockFreed) {
-			throw new IllegalArgumentException("ERROR IllegalArgumentException: Block not found in allocated list or already freed.");
 		}
 	}
 	
