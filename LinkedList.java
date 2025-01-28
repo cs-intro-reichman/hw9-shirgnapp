@@ -267,8 +267,11 @@ public class LinkedList {
 	 */
 
 	//public void remove(int index) {
+	//	if (size == 0) {
+	//		throw new IllegalArgumentException("ERROR IllegalArgumentException: List is empty.");
+	//	}
 	//	if (index < 0 || index >= size) {
-	//		throw new IllegalArgumentException("ERROR IllegalArgumentException: Position must be between 0 and size.");
+	//		throw new IllegalArgumentException("ERROR IllegalArgumentException: Position must be between 0 and size - 1.");
 	//	}
 	//	if (index == 0) {
 	//		if (size == 1) { 
@@ -277,41 +280,49 @@ public class LinkedList {
 	//		} else {
 	//			first = first.next;
 	//		}
-	//	} else {
-	//		Node previous = getNode(index - 1);
-	//		Node toRemove = previous.next;
-	//		previous.next = toRemove.next;
-	//		if (toRemove.next == null) { 
-	//			last = previous;
-	//		}
+	///	} else {
+		//	Node previous = getNode(index - 1);
+		//	Node toRemove = previous.next;
+		//	previous.next = toRemove.next;
+		//	if (toRemove.next == null) { 
+		//		last = previous;
+		//	}
 	//	}
 	//	size--;
 //	}
 	public void remove(int index) {
-		if (size == 0) {
-			throw new IllegalArgumentException("ERROR IllegalArgumentException: List is empty.");
+		if (index < 0 || index > size) {
+			throw new IllegalArgumentException(
+					"index must be between 0 and size");
 		}
-		if (index < 0 || index >= size) {
-			throw new IllegalArgumentException("ERROR IllegalArgumentException: Position must be between 0 and size - 1.");
-		}
+		Node current = first; 
+		Node prev = null;
 		if (index == 0) {
-			if (size == 1) { 
-				first = null;
+			first = current.next;
+			if (first == null) {  
 				last = null;
-			} else {
-				first = first.next;
 			}
+			size--;
+			return;
+		}
+		int counter = 0;
+
+		while (current != null && counter != index) {
+			prev = current;
+			current = current.next;
+			counter++;
+		}
+		if (current == null) {
+			return;
+		}
+		if (index == size - 1) {
+			prev.next = null; 
+			last = prev; 
 		} else {
-			Node previous = getNode(index - 1);
-			Node toRemove = previous.next;
-			previous.next = toRemove.next;
-			if (toRemove.next == null) { 
-				last = previous;
-			}
+			prev.next = current.next;
 		}
 		size--;
 	}
-	
 	
 	
 	/**
@@ -329,18 +340,47 @@ public class LinkedList {
 	//	}
 	//	remove(position);
 	//}
+	//public void remove(MemoryBlock block) {
+	//	if (block == null) {
+	//		throw new IllegalArgumentException("ERROR IllegalArgumentException: Block cannot be null.");
+	//	}
+	//
+	//	int position = indexOf(block);
+	//
+	//	if (position < 0) {
+	//		throw new IllegalArgumentException("ERROR IllegalArgumentException: Block not found. Position must be between 0 and size.");
+	//	}
+	
+	//	remove(position);
+	//}
 	public void remove(MemoryBlock block) {
-		if (block == null) {
-			throw new IllegalArgumentException("ERROR IllegalArgumentException: Block cannot be null.");
+		if (indexOf(block) == -1) {
+			throw new IllegalArgumentException("index must be between 0 and size");
 		}
-	
-		int position = indexOf(block);
-	
-		if (position < 0) {
-			throw new IllegalArgumentException("ERROR IllegalArgumentException: Block not found. Position must be between 0 and size.");
+		Node current = first; 
+		Node prev = null; 
+		if (block.equals(first.block)) {
+			first = first.next;
+			if (first == null) {  
+				last = null;
+			}
+			size--;
+			return;
 		}
-	
-		remove(position);
+		while (current != null) {
+			if (block.equals(current.block)) {
+				if (current == last) {
+					last = prev;
+					prev.next = null;
+				} else {
+					prev.next = current.next;
+				}
+				size--;
+				return;
+			}
+			prev = current;
+			current = current.next;	
+			}
 	}
 	
 
