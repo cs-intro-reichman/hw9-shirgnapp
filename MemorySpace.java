@@ -121,24 +121,61 @@ public class MemorySpace {
 	 * @param baseAddress
 	 *            the starting address of the block to freeList
 	 */
+	//public void free(int baseAddress) {
+	//	if (allocatedList.getSize() == 0) {
+	//		throw new IllegalArgumentException("ERROR IllegalArgumentException: index must be between 0 and size");
+	//	}
+	//
+	//	ListIterator allocatedIterator = allocatedList.iterator();
+	//	while (allocatedIterator.hasNext()) {
+	//		if (allocatedIterator.current.block.baseAddress == baseAddress) {
+	//			Node nodeToFree = allocatedIterator.current;
+	//			freeList.addLast(nodeToFree.block);
+	//		allocatedList.remove(nodeToFree);
+	//		return; // Exit after freeing the block
+	//		}
+	//		allocatedIterator.next();
+	//	}
+	//
+	//	throw new IllegalArgumentException("ERROR IllegalArgumentException: Block not found in allocated list or already freed.");
+	//}
+	//public void free(int baseAddress) {
+	//	if (allocatedList.getSize() == 0) {
+	//		throw new IllegalArgumentException("ERROR IllegalArgumentException: index must be between 0 and size");
+	//	}
+	//	ListIterator allocatedIterator = allocatedList.iterator();
+	//	while (allocatedIterator.hasNext()) {
+	//		if (allocatedIterator.current.block.baseAddress == baseAddress) {
+	//			Node nodeToFree = allocatedIterator.current;
+	//			freeList.addLast(nodeToFree.block);
+	//			allocatedList.remove(nodeToFree);
+	//
+	//			return; 
+	//		}
+	//		allocatedIterator.next();
+	//	}
+	//
+	//	throw new IllegalArgumentException("ERROR IllegalArgumentException: Block not found in allocated list or already freed.");
+	//}
 	public void free(int baseAddress) {
+	
 		if (allocatedList.getSize() == 0) {
 			throw new IllegalArgumentException("ERROR IllegalArgumentException: index must be between 0 and size");
 		}
-	
 		ListIterator allocatedIterator = allocatedList.iterator();
 		while (allocatedIterator.hasNext()) {
 			if (allocatedIterator.current.block.baseAddress == baseAddress) {
 				Node nodeToFree = allocatedIterator.current;
 				freeList.addLast(nodeToFree.block);
-			allocatedList.remove(nodeToFree);
-			return; // Exit after freeing the block
+				allocatedList.remove(nodeToFree);
+				return;
 			}
 			allocatedIterator.next();
 		}
 	
 		throw new IllegalArgumentException("ERROR IllegalArgumentException: Block not found in allocated list or already freed.");
 	}
+	
 	
 	
 	
